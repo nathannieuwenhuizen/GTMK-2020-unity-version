@@ -140,6 +140,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -165,7 +166,7 @@ SpriteRenderer:
   m_SortingLayer: -3
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: e76cf40de50020b4a8d6d08a18c383e7, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.22352943, g: 1, b: 0.86666673, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -194,6 +195,7 @@ MonoBehaviour:
   propPrefabs:
   - {fileID: 5455922119985805115, guid: fbba1242d68e89c4aa53a9d51af664f1, type: 3}
   - {fileID: 5836255118739716562, guid: 9913c3afb6f3f2540a52ec3049d03ddc, type: 3}
+  otherColor: {r: 0.2216981, g: 1, b: 0.8677135, a: 1}
 --- !u!82 &2790594728127616508
 AudioSource:
   m_ObjectHideFlags: 0

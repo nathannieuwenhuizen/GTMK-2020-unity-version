@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum ColorType
+{
+    white,
+    blue,
+}
 public class Layer : MonoBehaviour
 {
     private List<Human> humans;
@@ -12,6 +17,8 @@ public class Layer : MonoBehaviour
     public Transform propParent;
     private List<GameObject> props;
     public GameObject[] propPrefabs;
+    public Color otherColor;
+    private ColorType type = ColorType.white;
 
     private AudioSource audioS;
 
@@ -22,6 +29,30 @@ public class Layer : MonoBehaviour
         props = new List<GameObject>();
         spawnHumans(5);
         spawnProps(3);
+    }
+    public ColorType Type
+    {
+        get { return type; }
+        set
+        {
+            type = value;
+            UpdateColor();
+        }
+    }
+    public void UpdateColor()
+    {
+        Color col = type == ColorType.white ? Color.white : otherColor;
+        GetComponent<SpriteRenderer>().color = col;
+
+        foreach (Human human in humans)
+        {
+            human.GetComponentInChildren<SpriteRenderer>().color = col;
+        }
+        foreach (GameObject prop in props)
+        {
+            prop.GetComponentInChildren<SpriteRenderer>().color = col;
+        }
+
     }
 
     public void ChangePitch(float val)

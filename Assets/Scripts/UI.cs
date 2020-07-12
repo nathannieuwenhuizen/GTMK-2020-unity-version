@@ -2,24 +2,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UI : MonoBehaviour
 {
 
     public CanvasGroup scores;
     public CanvasGroup menu;
+    public CanvasGroup controls;
     public Text scoreText;
     public Text highScoreText;
     public Text introText;
 
     public GameObject world;
+
+    public GameObject singleButton;
+    public GameObject pairButtons;
     private void Start()
     {
         introText.gameObject.SetActive(true);
         UpdateHighScoreText(Settings.HighScore);
         scores.alpha = 0;
+        scores.interactable = false;
         world.gameObject.SetActive(false);
         UpdateScoreText(0);
+    }
+
+    public void ShowSingleButton()
+    {
+        singleButton.SetActive(true);
+        pairButtons.SetActive(false);
+    }
+    public void ShowPairButtons()
+    {
+        singleButton.SetActive(false);
+        pairButtons.SetActive(true);
     }
     public void FirstMove()
     {
@@ -27,10 +44,35 @@ public class UI : MonoBehaviour
         scores.gameObject.SetActive(true);
     }
 
+    public void ReloadScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void ShowControls()
+    {
+        controls.interactable = true;
+        menu.interactable = false;
+
+        StartCoroutine(FadeGroup(menu, 0));
+        StartCoroutine(FadeGroup(controls, 1));
+    }
+
+    public void ShowMenu()
+    {
+        controls.interactable = false;
+        menu.interactable = true;
+
+        StartCoroutine(FadeGroup(menu, 1));
+        StartCoroutine(FadeGroup(controls, 0));
+    }
     public void Play()
     {
+        ShowSingleButton();
         world.SetActive(true);
-        Debug.Log("play");
+        scores.interactable = true;
+        menu.interactable = false;
+
         StartCoroutine(FadeGroup(menu, 0));
         StartCoroutine(FadeGroup(scores, 1));
         menu.interactable = false;

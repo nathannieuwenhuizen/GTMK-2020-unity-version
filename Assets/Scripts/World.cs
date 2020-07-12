@@ -133,11 +133,14 @@ public class World : MonoBehaviour
     public void Update()
     {
         CheckMissingBeat();
-        
 
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            CheckBeat();
+            CheckBeat(ColorType.white);
+        }
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            CheckBeat(ColorType.blue);
         }
     }
     private void CheckMissingBeat()
@@ -169,7 +172,16 @@ public class World : MonoBehaviour
             NewItteration();
         }
     }
-    private void CheckBeat()
+
+    public void CheckWhite()
+    {
+        CheckBeat(ColorType.white);
+    }
+    public void CheckBlue()
+    {
+        CheckBeat(ColorType.blue);
+    }
+    public void CheckBeat(ColorType type)
     {
         if (layers.Count == 0 && !outliner.resetting  && !outliner.gameObject.active)
         {
@@ -199,7 +211,7 @@ public class World : MonoBehaviour
 
 
         float precentage = distance / (1f / (float)layers.Count); // between 0 and 50
-        if (precentage > precentageMarge || closestObject.inPulse)
+        if (precentage > precentageMarge || closestObject.inPulse || type != closestObject.layer.Type)
         {
             RemoveLayerAt(closestIndex);
         } else
@@ -220,12 +232,36 @@ public class World : MonoBehaviour
     }
     private void UpdateWorld()
     {
-         
+
+        bool extraColors = sizeOfWorld >= 10;
+        if (extraColors)
+        {
+            outliner.shrinkSpeed = 0.0035f;
+            ui.ShowPairButtons();
+        } else
+        {
+            outliner.shrinkSpeed = 0.0045f;
+            ui.ShowSingleButton();
+        }
+
         float totalSize = TotalSize;
         float sizePerPiece = TotalSize / layers.Count;
         outliner.maskWidth = sizePerPiece * .8f;
         for (int i = 0; i < layers.Count; i++)
         {
+            if (extraColors)
+            {
+                if (Random.value < 0.5f)
+                {
+                    layers[i].layer.Type = ColorType.blue;
+                } else
+                {
+                    layers[i].layer.Type = ColorType.white;
+                }
+            } else
+            {
+                layers[i].layer.Type = ColorType.white;
+            }
             layers[i].layer.ChangePitch(.3f + ((i/ TotalSize) * .7f));
             layers[i].inPulse = false;
             StartCoroutine(layers[i].ChangeSize(totalSize, totalSize - sizePerPiece * .8f, growCurve, 2f));
