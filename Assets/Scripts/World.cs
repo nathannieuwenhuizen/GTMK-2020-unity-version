@@ -16,11 +16,12 @@ public class World : MonoBehaviour
 
     public Outliner outliner;
 
-    public Text scoreText;
     private bool perfectItteration = true;
     public int sizeOfWorld = 0;
 
     public float precentageMarge = .4f;
+
+    public UI ui;
 
 
     public static World instance;
@@ -41,7 +42,6 @@ public class World : MonoBehaviour
         outliner.ResetScale();
         outliner.maxScale = TotalSize + .4f;
         UpdateSizes();
-        scoreText.text = sizeOfWorld == 0 ? "" :  sizeOfWorld + "";
 
     }
     void Start()
@@ -67,7 +67,7 @@ public class World : MonoBehaviour
             newPiece.setSize(newPiece.layer.transform, layers[index - 1].layer.transform.localScale.x);
             newPiece.setSize(newPiece.mask.transform, layers[index - 1].mask.transform.localScale.x);
         }
-        sizeOfWorld = layers.Count;
+        SizeOfWorld = layers.Count;
     }
     public void RemoveLayerAt(int index)
     {
@@ -81,11 +81,30 @@ public class World : MonoBehaviour
             Destroy(removeObject.mask.gameObject);
             layers.Remove(removeObject);
         }
-        sizeOfWorld = layers.Count;
+        SizeOfWorld = layers.Count;
 
         if (layers.Count == 0)
         {
             outliner.gameObject.SetActive(false);
+        }
+    }
+
+    public int SizeOfWorld
+    {
+        get
+        {
+            return sizeOfWorld;
+        }
+        set
+        {
+            sizeOfWorld = value;
+            ui.UpdateScoreText(value);
+
+            if (value > Settings.HighScore)
+            {
+                Settings.HighScore = value;
+                ui.UpdateHighScoreText(value);
+            }
         }
     }
 
@@ -132,6 +151,7 @@ public class World : MonoBehaviour
     {
         if (layers.Count == 0 && !outliner.resetting  && !outliner.gameObject.active)
         {
+            ui.Play();
             Debug.Log("Checking new itteration");
             NewItteration();
             return;
