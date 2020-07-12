@@ -25,7 +25,9 @@ public static class Settings
             PlayerPrefs.SetInt("Vibration", value == true ? 1 : 0);
             if (value)
             {
+#if UNITY_ANDROID
                 Handheld.Vibrate();
+#endif
             }
 
         }

@@ -77,10 +77,12 @@ public class World : MonoBehaviour
     }
     public void RemoveLayerAt(int index)
     {
+        #if UNITY_ANDROID
         if (Settings.Vibration)
         {
             Handheld.Vibrate();
         }
+        #endif
         failAudio.Play();
         CameraShake.instance.Shake(.5f);
 
@@ -133,7 +135,7 @@ public class World : MonoBehaviour
         CheckMissingBeat();
         
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetButtonDown("Fire1"))
         {
             CheckBeat();
         }
@@ -172,7 +174,7 @@ public class World : MonoBehaviour
         if (layers.Count == 0 && !outliner.resetting  && !outliner.gameObject.active)
         {
             particles.Play();
-            ui.Play();
+            ui.FirstMove();
             perfectItteration = true;
             failAudio.Play();
             NewItteration();
