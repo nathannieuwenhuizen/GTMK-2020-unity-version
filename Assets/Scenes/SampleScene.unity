@@ -5541,7 +5541,7 @@ GameObject:
   - component: {fileID: 1408192218}
   - component: {fileID: 1408192219}
   m_Layer: 5
-  m_Name: CanvasGroup
+  m_Name: score ui
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

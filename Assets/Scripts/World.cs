@@ -19,7 +19,7 @@ public class World : MonoBehaviour
     private bool perfectItteration = true;
     public int sizeOfWorld = 0;
 
-    public float precentageMarge = .4f;
+    public float precentageMarge = .5f;
 
     public UI ui;
     public ParticleSystem particles;
@@ -202,7 +202,10 @@ public class World : MonoBehaviour
             RemoveLayerAt(closestIndex);
         } else
         {
-            closestObject.layer.Dance();
+            if (layers.IndexOf(closestObject) != layers.Count - 1 || !perfectItteration)
+            {
+                closestObject.layer.Dance();
+            }
             closestObject.inPulse = true;
         }
         outliner.Pulse();
