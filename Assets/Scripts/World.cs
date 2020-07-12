@@ -22,6 +22,7 @@ public class World : MonoBehaviour
     public float precentageMarge = .4f;
 
     public UI ui;
+    public ParticleSystem particles;
 
 
     public static World instance;
@@ -35,6 +36,7 @@ public class World : MonoBehaviour
         if (perfectItteration) 
         {
             AddLayerAt(0);
+            particles.Emit(50);
         }
         perfectItteration = true;
 
@@ -105,6 +107,15 @@ public class World : MonoBehaviour
                 Settings.HighScore = value;
                 ui.UpdateHighScoreText(value);
             }
+            if (value == 0)
+            {
+                particles.Stop();
+            } else if (value == 1)
+            {
+                particles.Play();
+            }
+            particles.emissionRate = Mathf.Min(100, 3 +value * 5);
+            particles.startSpeed  = 5 + value;
         }
     }
 
@@ -125,13 +136,13 @@ public class World : MonoBehaviour
         bool allGood = true;
         foreach (LayerObject layer in layers)
         {
-            if (layer.active == false)
+            if (layer.inPulse == false)
             {
                 allGood = false;
             }
             if (layer != null)
             {
-                if (!layer.active && outliner.Scale < layer.layer.transform.localScale.x)
+                if (!layer.inPulse && outliner.Scale < layer.layer.transform.localScale.x)
                 {
                     float distance = layer.layer.transform.localScale.x - outliner.Scale;
                     float precentage = distance / (TotalSize / (float)layers.Count);
@@ -151,6 +162,7 @@ public class World : MonoBehaviour
     {
         if (layers.Count == 0 && !outliner.resetting  && !outliner.gameObject.active)
         {
+            particles.Play();
             ui.Play();
             Debug.Log("Checking new itteration");
             NewItteration();
@@ -176,13 +188,13 @@ public class World : MonoBehaviour
 
 
         float precentage = distance / (1f / (float)layers.Count); // between 0 and 50
-        if (precentage > precentageMarge || closestObject.active)
+        if (precentage > precentageMarge || closestObject.inPulse)
         {
             RemoveLayerAt(closestIndex);
         } else
         {
             closestObject.layer.Dance();
-            closestObject.active = true;
+            closestObject.inPulse = true;
         }
         outliner.Pulse();
         
@@ -200,7 +212,7 @@ public class World : MonoBehaviour
         outliner.maskWidth = sizePerPiece * .8f;
         for (int i = 0; i < layers.Count; i++)
         {
-            layers[i].active = false;
+            layers[i].inPulse = false;
             StartCoroutine(layers[i].ChangeSize(totalSize, totalSize - sizePerPiece * .8f, growCurve, 2f));
             totalSize -= sizePerPiece;
 
@@ -214,7 +226,7 @@ public class LayerObject
 {
     public Layer layer;
     public SpriteMask mask;
-    public bool active = false;
+    public bool inPulse = false;
     public IEnumerator ChangeSize(float layerEnd, float maskEnd, AnimationCurve curve, float size)
     {
         float layerStart = layer.transform.localScale.x;
