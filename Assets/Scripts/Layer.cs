@@ -12,12 +12,22 @@ public class Layer : MonoBehaviour
     public Transform propParent;
     private List<GameObject> props;
     public GameObject[] propPrefabs;
+
+    private AudioSource audioS;
+
     public void Setup()
     {
+        audioS = GetComponent<AudioSource>();
         humans = new List<Human>();
         props = new List<GameObject>();
         spawnHumans(5);
         spawnProps(3);
+    }
+
+    public void ChangePitch(float val)
+    {
+        audioS.pitch = val;
+        audioS.volume = Mathf.Max(.2f, 1 - (val / 2));
     }
     public void spawnHumans(int amount)
     {
@@ -86,9 +96,10 @@ public class Layer : MonoBehaviour
             prop.transform.localScale = scale;
         }
     }
-    // Update is called once per frame
     public void Dance()
     {
+        audioS.Play();
+
         foreach (Human human in humans)
         {
             human.Dance();

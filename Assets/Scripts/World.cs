@@ -24,11 +24,17 @@ public class World : MonoBehaviour
     public UI ui;
     public ParticleSystem particles;
 
+    private AudioSource failAudio;
 
     public static World instance;
     private void Awake()
-    {
+    { 
         instance = this;
+    }
+    void Start()
+    {
+        failAudio = GetComponent<AudioSource>();
+        layers = new List<LayerObject>();
     }
 
     public void NewItteration()
@@ -36,6 +42,8 @@ public class World : MonoBehaviour
         if (perfectItteration) 
         {
             AddLayerAt(0);
+            StopAllCoroutines();
+            StartCoroutine(SuperParty());
             particles.Emit(50);
         }
         perfectItteration = true;
@@ -43,12 +51,8 @@ public class World : MonoBehaviour
         outliner.gameObject.SetActive(true);
         outliner.ResetScale();
         outliner.maxScale = TotalSize + .4f;
-        UpdateSizes();
+        UpdateWorld();
 
-    }
-    void Start()
-    {
-        layers = new List<LayerObject>();
     }
     public void AddLayerAt(int index = -1)
     {
@@ -73,6 +77,11 @@ public class World : MonoBehaviour
     }
     public void RemoveLayerAt(int index)
     {
+        if (Settings.Vibration)
+        {
+            Handheld.Vibrate();
+        }
+        failAudio.Play();
         CameraShake.instance.Shake(.5f);
 
         perfectItteration = false;
@@ -164,7 +173,8 @@ public class World : MonoBehaviour
         {
             particles.Play();
             ui.Play();
-            Debug.Log("Checking new itteration");
+            perfectItteration = true;
+            failAudio.Play();
             NewItteration();
             return;
         }
@@ -175,7 +185,6 @@ public class World : MonoBehaviour
         int closestIndex = 0;
         foreach(LayerObject layer in layers)
         {
-            Debug.Log("Distance: " + Mathf.Abs(outliner.Scale - layer.layer.transform.localScale.x));
             if (Mathf.Abs(outliner.Scale - layer.layer.transform.localScale.x) < distance)
             {
                 closestIndex = index;
@@ -204,7 +213,7 @@ public class World : MonoBehaviour
             return 1 - (Mathf.Pow(.7f, layers.Count));
         }
     }
-    private void UpdateSizes()
+    private void UpdateWorld()
     {
          
         float totalSize = TotalSize;
@@ -212,6 +221,7 @@ public class World : MonoBehaviour
         outliner.maskWidth = sizePerPiece * .8f;
         for (int i = 0; i < layers.Count; i++)
         {
+            layers[i].layer.ChangePitch(.3f + ((i/ TotalSize) * .7f));
             layers[i].inPulse = false;
             StartCoroutine(layers[i].ChangeSize(totalSize, totalSize - sizePerPiece * .8f, growCurve, 2f));
             totalSize -= sizePerPiece;
@@ -219,7 +229,14 @@ public class World : MonoBehaviour
             layers[i].SetLayerIndex(i * 3);
         }
     }
-
+    public IEnumerator SuperParty()
+    {
+        for(int i = 0; i < layers.Count - 1; i++)
+        {
+            layers[i].layer.Dance();
+            yield return new WaitForSeconds(.4f / layers.Count);
+        }
+    }
 }
 
 public class LayerObject
