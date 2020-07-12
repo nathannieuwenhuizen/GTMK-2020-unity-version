@@ -24,6 +24,7 @@ public class World : MonoBehaviour
     // Start is called before the first frame update
     public static World instance;
 
+    
     private void Awake()
     {
         instance = this;
@@ -102,13 +103,16 @@ public class World : MonoBehaviour
         bool allGood = true;
         foreach (LayerObject layer in layers)
         {
+            if (layer.active == false)
+            {
+                allGood = false;
+            }
             if (layer != null)
             {
                 if (!layer.active && outliner.Scale < layer.layer.transform.localScale.x)
                 {
-                    allGood = false;
                     float distance = layer.layer.transform.localScale.x - outliner.Scale;
-                    float precentage = distance / (1f / (float)layers.Count);
+                    float precentage = distance / (TotalSize / (float)layers.Count);
                     if (precentage > precentageMarge)
                     {
                         RemoveLayerAt(layers.IndexOf(layer));
@@ -118,7 +122,7 @@ public class World : MonoBehaviour
         }
         if (allGood)
         {
-            //NewItteration();
+            NewItteration();
         }
     }
     private void CheckBeat()
@@ -153,20 +157,27 @@ public class World : MonoBehaviour
         Debug.Log("precentage : " + precentage + "at index: " + closestIndex);
         if (precentage > precentageMarge)
         {
+            CameraShake.instance.Shake(.5f);
             RemoveLayerAt(closestIndex);
         } else
         {
+            closestObject.layer.Dance();
             closestObject.active = true;
             Debug.Log("Dance!");
         }
+        outliner.Pulse();
         
     }
 
+    public float TotalSize { get {
+            return 1 - (Mathf.Pow(.7f, layers.Count));
+        }
+    }
     private void UpdateSizes()
     {
          
-        float totalSize = 1;
-        float sizePerPiece = totalSize / layers.Count;
+        float totalSize = TotalSize;
+        float sizePerPiece = TotalSize / layers.Count;
         outliner.maskWidth = sizePerPiece * .8f;
         for (int i = 0; i < layers.Count; i++)
         {

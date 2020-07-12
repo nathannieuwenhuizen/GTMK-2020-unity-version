@@ -31,7 +31,10 @@ public class Outliner : MonoBehaviour
             World.instance.NewItteration();
         }
     }
-
+    public void Pulse()
+    {
+        sprite.GetComponent<ParticleSystem>().Play();
+    }
     public void ResetScale(bool newWorld = false)
     {
         if (resetting) return;

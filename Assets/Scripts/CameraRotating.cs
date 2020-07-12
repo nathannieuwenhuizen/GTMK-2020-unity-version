@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Human : MonoBehaviour
+public class CameraRotating : MonoBehaviour
 {
-    public Animator anim;
 
+
+    public float speed;
     // Start is called before the first frame update
     void Start()
     {
@@ -13,12 +14,8 @@ public class Human : MonoBehaviour
     }
 
     // Update is called once per frame
-    public void Dance()
+    void Update()
     {
-        anim.SetBool("dance", true);
-    }
-    public void Idle()
-    {
-        anim.SetBool("dance", false);
+        transform.Rotate(new Vector3(0, 0, speed));
     }
 }

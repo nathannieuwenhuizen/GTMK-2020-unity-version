@@ -41,6 +41,9 @@ TagManager:
   - name: World
     uniqueID: 3761364735
     locked: 0
+  - name: props
+    uniqueID: 2599271321
+    locked: 0
   - name: ui
     uniqueID: 2663805305
     locked: 0
