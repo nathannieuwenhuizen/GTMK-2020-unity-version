@@ -12,7 +12,7 @@ public class Layer : MonoBehaviour
     public Transform propParent;
     private List<GameObject> props;
     public GameObject[] propPrefabs;
-    void Start()
+    public void Setup()
     {
         humans = new List<Human>();
         props = new List<GameObject>();
@@ -73,7 +73,19 @@ public class Layer : MonoBehaviour
         tr.localPosition = pos;
         tr.Rotate(0, 0, angle);
     }
-
+    public void updateScale(float size)
+    {
+        float aspect = 1 / (size * transform.localScale.x);
+        Vector3 scale = new Vector3(aspect, aspect, aspect);
+        foreach (Human human in humans)
+        {
+            human.transform.localScale = scale;
+        }
+        foreach (GameObject prop in props)
+        {
+            prop.transform.localScale = scale;
+        }
+    }
     // Update is called once per frame
     public void Dance()
     {

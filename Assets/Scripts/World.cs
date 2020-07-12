@@ -20,11 +20,10 @@ public class World : MonoBehaviour
     private bool perfectItteration = true;
     public int sizeOfWorld = 0;
 
-    public float precentageMarge = .33f;
-    // Start is called before the first frame update
-    public static World instance;
+    public float precentageMarge = .4f;
 
-    
+
+    public static World instance;
     private void Awake()
     {
         instance = this;
@@ -32,15 +31,18 @@ public class World : MonoBehaviour
 
     public void NewItteration()
     {
-        outliner.gameObject.SetActive(true);
-        outliner.ResetScale();
-        Debug.Log("New itteration");
         if (perfectItteration) 
         {
             AddLayerAt(0);
         }
         perfectItteration = true;
+
+        outliner.gameObject.SetActive(true);
+        outliner.ResetScale();
+        outliner.maxScale = TotalSize + .4f;
         UpdateSizes();
+        scoreText.text = sizeOfWorld == 0 ? "" :  sizeOfWorld + "";
+
     }
     void Start()
     {
@@ -50,7 +52,7 @@ public class World : MonoBehaviour
     {
         Layer newLayer = GameObject.Instantiate(layerPrefab, layerParent).GetComponent<Layer>();
         SpriteMask newMask = GameObject.Instantiate(maskPrefab, maskParent).GetComponent<SpriteMask>();
-
+        newLayer.Setup();
         LayerObject newPiece = new LayerObject()
         {
             layer = newLayer,
@@ -69,6 +71,8 @@ public class World : MonoBehaviour
     }
     public void RemoveLayerAt(int index)
     {
+        CameraShake.instance.Shake(.5f);
+
         perfectItteration = false;
         if (index < layers.Count)
         {
@@ -76,7 +80,6 @@ public class World : MonoBehaviour
             Destroy(removeObject.layer.gameObject);
             Destroy(removeObject.mask.gameObject);
             layers.Remove(removeObject);
-            //UpdateSizes();
         }
         sizeOfWorld = layers.Count;
 
@@ -152,18 +155,14 @@ public class World : MonoBehaviour
         }
 
 
-        float precentage = distance / (1f / (float)layers.Count);
-        scoreText.text = Mathf.Round(precentage * 100) + "";
-        Debug.Log("precentage : " + precentage + "at index: " + closestIndex);
-        if (precentage > precentageMarge)
+        float precentage = distance / (1f / (float)layers.Count); // between 0 and 50
+        if (precentage > precentageMarge || closestObject.active)
         {
-            CameraShake.instance.Shake(.5f);
             RemoveLayerAt(closestIndex);
         } else
         {
             closestObject.layer.Dance();
             closestObject.active = true;
-            Debug.Log("Dance!");
         }
         outliner.Pulse();
         
@@ -182,7 +181,7 @@ public class World : MonoBehaviour
         for (int i = 0; i < layers.Count; i++)
         {
             layers[i].active = false;
-            StartCoroutine(layers[i].ChangeSize(totalSize, totalSize - sizePerPiece * .8f, growCurve));
+            StartCoroutine(layers[i].ChangeSize(totalSize, totalSize - sizePerPiece * .8f, growCurve, 2f));
             totalSize -= sizePerPiece;
 
             layers[i].SetLayerIndex(i * 3);
@@ -196,7 +195,7 @@ public class LayerObject
     public Layer layer;
     public SpriteMask mask;
     public bool active = false;
-    public IEnumerator ChangeSize(float layerEnd, float maskEnd, AnimationCurve curve)
+    public IEnumerator ChangeSize(float layerEnd, float maskEnd, AnimationCurve curve, float size)
     {
         float layerStart = layer.transform.localScale.x;
         float maskStart = mask.transform.localScale.x;
@@ -208,6 +207,7 @@ public class LayerObject
             index += Time.deltaTime;
             setSize(layer.transform, Mathf.Lerp(layerStart, layerEnd, curve.Evaluate(index / duration)));
             setSize(mask.transform, Mathf.Lerp(maskStart, maskEnd, curve.Evaluate(index / duration)));
+            layer.updateScale(size);
         }
     }
     public void SetLayerIndex( int val)
